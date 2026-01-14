@@ -1,0 +1,6 @@
+{
+  "type": "module",
+  "name": "handipass-legifrance",
+  "version": "1.0.0",
+  "description": "Interface accessible pour consulter Légifrance"
+}
