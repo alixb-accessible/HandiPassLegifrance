@@ -1,1 +1,322 @@
-index test 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandiPass Légifrance - Recherche accessible dans les textes de loi</title>
+    <meta name="description" content="Interface accessible pour rechercher et consulter les textes de loi sur Légifrance">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Accessibility Toolbar -->
+    <link rel="stylesheet" href="https://alixb-accessible.github.io/faites-mieux-toolbar/faites-mieux.css">
+    <script src="https://alixb-accessible.github.io/faites-mieux-toolbar/faites-mieux.js" defer></script>
+    
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div>
+                    <h1>HandiPass Légifrance</h1>
+                    <p class="tagline">Recherche accessible dans les textes de loi</p>
+                </div>
+                <a href="https://alixb-accessible.github.io/Handipass/" class="back-link">← Retour à Handipass</a>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="container">
+        <!-- Page d'accueil / Recherche -->
+        <section id="home-section">
+            <div class="hero">
+                <h2>Recherchez dans les textes de loi en toute simplicité</h2>
+                <p>Interface accessible et intuitive pour consulter Légifrance sans difficulté</p>
+            </div>
+
+            <!-- Onglets de recherche -->
+            <div class="search-tabs">
+                <button class="search-tab active" onclick="switchSearchTab('simple')" id="tab-simple">
+                    Recherche simple
+                </button>
+                <button class="search-tab" onclick="switchSearchTab('code')" id="tab-code">
+                    Par code
+                </button>
+                <button class="search-tab" onclick="switchSearchTab('article')" id="tab-article">
+                    Par article
+                </button>
+            </div>
+
+            <!-- Recherche simple -->
+            <div id="search-simple" class="search-panel active">
+                <form onsubmit="searchSimple(event)" class="search-form">
+                    <label for="search-simple-input" class="search-label">
+                        Recherchez par mot-clé
+                    </label>
+                    <div class="search-box">
+                        <input 
+                            type="search" 
+                            id="search-simple-input" 
+                            class="search-input" 
+                            placeholder="Ex: AAH, MDPH, accessibilité, handicap..."
+                            required
+                        >
+                        <button type="submit" class="search-btn">Rechercher</button>
+                    </div>
+                    <p class="search-help">
+                        Tapez un mot-clé et lancez la recherche pour trouver les textes correspondants
+                    </p>
+                </form>
+
+                <div class="search-suggestions">
+                    <p><strong>Suggestions :</strong></p>
+                    <div class="suggestion-buttons">
+                        <button class="suggestion-btn" onclick="quickSearch('AAH')">AAH</button>
+                        <button class="suggestion-btn" onclick="quickSearch('MDPH')">MDPH</button>
+                        <button class="suggestion-btn" onclick="quickSearch('PCH')">PCH</button>
+                        <button class="suggestion-btn" onclick="quickSearch('accessibilité')">Accessibilité</button>
+                        <button class="suggestion-btn" onclick="quickSearch('RQTH')">RQTH</button>
+                        <button class="suggestion-btn" onclick="quickSearch('discrimination')">Discrimination</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recherche par code -->
+            <div id="search-code" class="search-panel">
+                <form onsubmit="searchByCode(event)" class="search-form">
+                    <label for="code-select" class="search-label">
+                        Sélectionnez un code
+                    </label>
+                    <select id="code-select" class="code-select" required>
+                        <option value="">-- Choisir un code --</option>
+                        <option value="LEGITEXT000006074069">Code de l'action sociale et des familles</option>
+                        <option value="LEGITEXT000006072050">Code de la santé publique</option>
+                        <option value="LEGITEXT000006072050">Code du travail</option>
+                        <option value="LEGITEXT000006070721">Code civil</option>
+                        <option value="LEGITEXT000006070719">Code pénal</option>
+                        <option value="LEGITEXT000006074096">Code de l'éducation</option>
+                        <option value="LEGITEXT000006074228">Code de la construction et de l'habitation</option>
+                        <option value="LEGITEXT000006074075">Code des transports</option>
+                    </select>
+                    <button type="submit" class="search-btn" style="margin-top: 1rem;">Afficher le code</button>
+                    <p class="search-help">
+                        Sélectionnez un code pour voir sa structure et ses articles
+                    </p>
+                </form>
+            </div>
+
+            <!-- Recherche par article -->
+            <div id="search-article" class="search-panel">
+                <form onsubmit="searchByArticle(event)" class="search-form">
+                    <label for="article-input" class="search-label">
+                        Recherchez un article précis
+                    </label>
+                    <div class="search-box">
+                        <input 
+                            type="text" 
+                            id="article-input" 
+                            class="search-input" 
+                            placeholder="Ex: L114-1, R241-33, Article 225-1..."
+                            required
+                        >
+                        <button type="submit" class="search-btn">Rechercher</button>
+                    </div>
+                    <p class="search-help">
+                        Entrez la référence d'un article (avec ou sans le mot "Article")
+                    </p>
+                </form>
+
+                <div class="search-suggestions">
+                    <p><strong>Articles fréquents :</strong></p>
+                    <div class="suggestion-buttons">
+                        <button class="suggestion-btn" onclick="quickArticle('L114-1')">L114-1 (Définition handicap)</button>
+                        <button class="suggestion-btn" onclick="quickArticle('L241-6')">L241-6 (PCH)</button>
+                        <button class="suggestion-btn" onclick="quickArticle('L821-1')">L821-1 (AAH)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Favoris -->
+            <div class="favorites-section" id="favorites-section" style="display: none;">
+                <h3>Mes favoris</h3>
+                <div id="favorites-list"></div>
+            </div>
+        </section>
+
+        <!-- Résultats de recherche -->
+        <section id="results-section" style="display: none;">
+            <button class="back-btn" onclick="backToSearch()">← Nouvelle recherche</button>
+            
+            <div id="loading" class="loading" style="display: none;">
+                <p>Recherche en cours...</p>
+            </div>
+
+            <div id="results-container"></div>
+        </section>
+
+        <!-- Affichage d'un texte -->
+        <section id="text-section" style="display: none;">
+            <button class="back-btn" onclick="backToResults()">← Retour aux résultats</button>
+            
+            <div id="text-container"></div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p><strong>HandiPass Légifrance</strong> - Interface accessible de consultation</p>
+            <p style="margin: 0.5rem 0;">
+                Les textes affichés proviennent de Légifrance (DILA). 
+                <a href="#" onclick="showMentions(); return false;" style="color: #3b82f6; text-decoration: underline; font-weight: 600;">Mentions légales et crédits</a>
+            </p>
+            <p>En cas de doute, consultez toujours <a href="https://www.legifrance.gouv.fr" target="_blank" rel="noopener noreferrer" style="color: #3b82f6;">la source officielle Légifrance</a></p>
+            <p class="ti-racoon">Propulsé par Ti Racoon</p>
+        </div>
+    </footer>
+
+    <!-- Section Mentions Légales -->
+    <section id="mentions-section" style="display: none;">
+        <div class="container">
+            <button class="back-btn" onclick="closeMentions()">Retour</button>
+            
+            <h2>Mentions Légales et Crédits</h2>
+            
+            <div style="background: #dbeafe; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                <p style="font-weight: 600;">Notre mission : Rendre Légifrance accessible à tous</p>
+            </div>
+
+            <h3 style="margin-top: 2rem; color: #1a1a1a;">1. Qui sommes-nous ?</h3>
+            <p>
+                <strong>HandiPass Légifrance</strong> est une interface accessible développée par Ti Racoon pour faciliter l'accès aux textes de loi pour les personnes en situation de handicap.<br><br>
+                Cette plateforme est un projet complémentaire de <a href="https://alixb-accessible.github.io/Handipass/" style="color: #3b82f6;">Handipass</a>, plateforme d'information juridique sur le handicap.
+            </p>
+
+            <h3 style="margin-top: 2rem; color: #1a1a1a;">2. Source des données</h3>
+            <p>
+                <strong>Tous les textes de loi affichés proviennent de Légifrance</strong>, le service public de la diffusion du droit géré par la Direction de l'information légale et administrative (DILA).
+            </p>
+            <p>
+                Nous utilisons l'<strong>API publique de Légifrance</strong> pour récupérer les textes officiels. Aucun texte n'est modifié. Nous nous contenons de présenter ces textes dans une interface plus accessible et intuitive.
+            </p>
+            <p>
+                <strong>Légifrance reste la source officielle.</strong> En cas de doute ou pour un usage officiel, consultez toujours <a href="https://www.legifrance.gouv.fr" target="_blank" style="color: #3b82f6;">www.legifrance.gouv.fr</a>
+            </p>
+
+            <h3 style="margin-top: 2rem; color: #1a1a1a;">3. Notre démarche</h3>
+            <p>
+                Le site Légifrance, bien que complet, présente des <strong>difficultés d'accessibilité</strong> pour les personnes en situation de handicap (navigation complexe, contrastes insuffisants, lecteurs d'écran incompatibles, etc.).
+            </p>
+            <p>
+                <strong>HandiPass Légifrance a été créé pour :</strong>
+            </p>
+            <ul style="margin-left: 2rem; margin-bottom: 1rem;">
+                <li>Simplifier l'accès aux textes de loi</li>
+                <li>Offrir une interface accessible (RGAA, contrastes, navigation clavier)</li>
+                <li>Permettre des recherches intuitives par mot-clé</li>
+                <li>Faciliter le téléchargement et la copie des textes</li>
+                <li>Sauvegarder les textes favoris localement</li>
+            </ul>
+
+            <h3 style="margin-top: 2rem; color: #1a1a1a;">4. Protection des données (RGPD)</h3>
+            
+            <h4 style="margin-top: 1rem; color: #374151;">4.1 Aucune collecte de données personnelles</h4>
+            <p style="background: #dcfce7; padding: 1rem; border-left: 4px solid #22c55e; border-radius: 4px;">
+                <strong>HandiPass Légifrance ne collecte AUCUNE donnée personnelle.</strong><br>
+                Nous n'utilisons ni compte utilisateur, ni cookies de tracking, ni analytics.
+            </p>
+
+            <h4 style="margin-top: 1rem; color: #374151;">4.2 Stockage local uniquement</h4>
+            <p>
+                Les fonctionnalités suivantes utilisent le <strong>localStorage de votre navigateur</strong> (les données restent sur votre appareil) :
+            </p>
+            <ul style="margin-left: 2rem; margin-bottom: 1rem;">
+                <li>Sauvegarde de vos favoris</li>
+                <li>Historique de recherche (optionnel)</li>
+            </ul>
+            <p>
+                Vous pouvez effacer ces données à tout moment en vidant les données de navigation de votre navigateur.
+            </p>
+
+            <h4 style="margin-top: 1rem; color: #374151;">4.3 Appels à l'API Légifrance</h4>
+            <p>
+                Lorsque vous effectuez une recherche, votre navigateur envoie une requête directe à l'API Légifrance. 
+                Ces requêtes ne transitent pas par nos serveurs. Elles sont soumises à la politique de confidentialité de la DILA.
+            </p>
+
+            <h3 style="margin-top: 2rem; color: #1a1a1a;">5. Décharge de responsabilité</h3>
+            <p>
+                <strong>HandiPass Légifrance</strong> est un outil d'aide à la recherche et ne constitue pas :
+            </p>
+            <ul style="margin-left: 2rem; margin-bottom: 1rem;">
+                <li>Un conseil juridique personnalisé</li>
+                <li>Une garantie d'exactitude absolue</li>
+                <li>Une certification officielle des textes</li>
+            </ul>
+            <p>
+                Bien que nous nous efforcions d'afficher les textes les plus récents via l'API, <strong>seule la version publiée sur Légifrance fait foi légalement</strong>.
+            </p>
+
+            <h3 style="margin-top: 2rem; color: #1a1a1a;">6. Propriété intellectuelle</h3>
+            <p>
+                Les <strong>textes de loi</strong> appartiennent au domaine public et sont diffusés par la DILA.<br>
+                L'<strong>interface, le design et le code</strong> de HandiPass Légifrance sont développés par Ti Racoon et protégés par le droit d'auteur.
+            </p>
+
+            <h3 style="margin-top: 2rem; color: #1a1a1a;">7. Accessibilité</h3>
+            <p>
+                Ce site vise la conformité <strong>RGAA (Référentiel Général d'Amélioration de l'Accessibilité)</strong>. 
+                Si vous rencontrez des difficultés d'accès, merci de nous le signaler via le formulaire de contact ci-dessous.
+            </p>
+
+            <h3 style="margin-top: 2rem; color: #1a1a1a;">8. Contact</h3>
+            <p>
+                Pour toute question concernant cette plateforme, son accessibilité ou son fonctionnement :
+            </p>
+
+            <form action="https://formspree.io/f/mjggvoov" method="POST" style="max-width: 600px; margin-top: 1.5rem;">
+                <div class="form-group">
+                    <label for="contact-name">Votre nom</label>
+                    <input type="text" id="contact-name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-email-form">Votre email</label>
+                    <input type="email" id="contact-email-form" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-subject">Sujet</label>
+                    <input type="text" id="contact-subject" name="subject" required placeholder="Ex: Problème d'accessibilité">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-message">Votre message</label>
+                    <textarea id="contact-message" name="message" required style="min-height: 150px;" placeholder="Décrivez votre demande..."></textarea>
+                </div>
+                
+                <button type="submit" class="search-btn">Envoyer le message</button>
+            </form>
+
+            <p style="margin-top: 2rem; font-style: italic; color: #6b7280;">
+                Dernière mise à jour : Janvier 2026
+            </p>
+
+            <button class="back-btn" onclick="closeMentions()" style="margin-top: 2rem;">Retour</button>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
