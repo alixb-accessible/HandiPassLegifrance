@@ -19,15 +19,17 @@ async function getAccessToken() {
 
     // Sinon, on en demande un nouveau
     try {
+        // Encoder les credentials en Base64 pour Basic Auth
+        const credentials = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
+        
         const response = await fetch(TOKEN_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': `Basic ${credentials}`
             },
             body: new URLSearchParams({
                 grant_type: 'client_credentials',
-                client_id: CLIENT_ID,
-                client_secret: CLIENT_SECRET,
                 scope: 'openid'
             })
         });
@@ -35,14 +37,16 @@ async function getAccessToken() {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Erreur OAuth:', response.status, errorText);
-            throw new Error(`Erreur OAuth: ${response.status}`);
+            throw new Error(`Erreur OAuth: ${response.status} - ${errorText}`);
         }
 
         const data = await response.json();
         
         // Stocker le token en cache (expire dans 1h)
         cachedToken = data.access_token;
-        tokenExpiration = Date.now() + (data.expires_in || 3600) * 1000;
+        tokenExpiration = Date.now() + ((data.expires_in || 3600) * 1000) - 60000; // -1min de marge
+        
+        console.log('Token obtenu avec succès, expire dans', data.expires_in, 'secondes');
         
         return cachedToken;
 
