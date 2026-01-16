@@ -93,19 +93,22 @@ export default async function handler(req, res) {
                 endpoint = `${API_BASE_URL}/search`;
                 body = {
                     recherche: {
-                        champs: [{
-                            typeChamp: 'ALL',
-                            criteres: [{
-                                typeRecherche: 'UN_DES_MOTS',
-                                valeur: keyword
-                            }]
-                        }],
+                        champs: [
+                            {
+                                typeChamp: "ALL",
+                                criteres: [
+                                    {
+                                        typeRecherche: "TOUS_LES_MOTS",
+                                        valeur: keyword,
+                                        operateur: "ET"
+                                    }
+                                ]
+                            }
+                        ],
                         pageNumber: 1,
-                        pageSize: 20,
-                        sort: 'PERTINENCE',
-                        operateur: 'ET'
-                    },
-                    fond: 'GLOBAL'
+                        pageSize: 10,
+                        sort: "PERTINENCE"
+                    }
                 };
                 break;
 
